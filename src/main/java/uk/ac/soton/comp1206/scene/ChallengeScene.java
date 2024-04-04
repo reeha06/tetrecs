@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBoard;
 import uk.ac.soton.comp1206.game.Game;
+import uk.ac.soton.comp1206.game.Multimedia;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 
@@ -43,6 +44,9 @@ public class ChallengeScene extends BaseScene {
 
         setupGame();
 
+        Multimedia.stopAudio();
+        Multimedia.playMusic("game_start.wav");
+
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
 
         var challengePane = new StackPane();
@@ -57,20 +61,34 @@ public class ChallengeScene extends BaseScene {
         var board = new GameBoard(game.getGrid(),gameWindow.getWidth()/2,gameWindow.getWidth()/2);
         mainPane.setCenter(board);
         Label livesLabel = new Label("Lives left = 3");
-        livesLabel.textProperty().bind(game.lives.asString("Lives: %d"));
+        livesLabel.textProperty().bind(game.getLives().asString("Lives: %d"));
         livesLabel.setFont(new Font(42));
         livesLabel.setStyle("-fx-text-fill: white;");
+        livesLabel.getStyleClass().add("lives");
+
+        Label levelLabel = new Label();
+        levelLabel.textProperty().bind(game.getLevel().asString("Level: %d"));
+        levelLabel.setFont(new Font(42));
+        levelLabel.setStyle("-fx-text-fill: white;");
+        levelLabel.getStyleClass().add("level");
+
+        Label multiplierLabel = new Label();
+        multiplierLabel.textProperty().bind(game.getMultiplier().asString("Multiplier: x%d"));
+        multiplierLabel.setFont(new Font(42));
+        multiplierLabel.setStyle("-fx-text-fill: white;");
 
         VBox b = new VBox();
         Label scoreLabel = new Label();
-        scoreLabel.textProperty().bind(game.score.asString("Score: %d"));
+        scoreLabel.textProperty().bind(game.getScore().asString("Score: %d"));
         scoreLabel.setFont(new Font(42));
         scoreLabel.setStyle("-fx-text-fill: white;");
+        scoreLabel.getStyleClass().add("score");
+
         Label currentShape = new Label();
         // currentShape.textProperty().bind(game.currentPiece.toString());
         currentShape.setFont(new Font(42));
         currentShape.setStyle("-fx-text-fill: white;");
-        b.getChildren().addAll(livesLabel, scoreLabel, currentShape);
+        b.getChildren().addAll(livesLabel, scoreLabel, levelLabel, multiplierLabel, currentShape);
 
         mainPane.setRight(b);
         // create timeline animation
@@ -89,7 +107,7 @@ public class ChallengeScene extends BaseScene {
             // check if lives are above 0 before restarting animation
             if (game.lives.get() > 0) {
                 // reset rectangle's width
-                rectangle.setWidth(200);
+                rectangle.setWidth(800);
                 timeline.playFromStart();
             }
         });

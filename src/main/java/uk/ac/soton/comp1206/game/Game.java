@@ -20,7 +20,9 @@ public class Game {
     private Random rand = new Random();
     public GamePiece currentPiece = spawnPiece();
     public SimpleIntegerProperty lives = new SimpleIntegerProperty(3);
+    public SimpleIntegerProperty level = new SimpleIntegerProperty(0);
     public SimpleIntegerProperty score = new SimpleIntegerProperty(0);
+    public SimpleIntegerProperty multiplier = new SimpleIntegerProperty(1);
     public SimpleStringProperty piece = new SimpleStringProperty();
     /**
      * Number of rows
@@ -70,10 +72,6 @@ public class Game {
      * @param gameBlock the block that was clicked
      */
     public void blockClicked(GameBlock gameBlock) {
-        //Get the position of this block
-//        int x = gameBlock.getX();
-//        int y = gameBlock.getY();
-//
 //        //Get the new value for this block
 //        int previousValue = grid.get(x,y);
 //        int newValue = previousValue + 1;
@@ -90,17 +88,9 @@ public class Game {
         grid.playPiece(x, y, currentPiece);
         int s = afterPiece();
         score.set(score.get()+s);
+        setLevel();
         nextPiece();
     }
-//    public void playPiece(GameBlock gameBlock) {
-//        // get the position of this block
-//        int x = gameBlock.getX();
-//        int y = gameBlock.getY();
-//        grid.playPiece(x, y, currentPiece);
-//        int s = afterPiece();
-//        score.set(score.get()+s);
-//        nextPiece();
-//    }
 
     /**
      * Get the grid model inside this game representing the game state of the board
@@ -162,7 +152,14 @@ public class Game {
         for (GameBlockCoordinate g: set) {
             grid.set(g.getX(), g.getY(), 0);
         }
-        return counter*100;
+        // if counter >= 1 then increase mulitplier by one otherwise put multiplier to 1 again
+        if (counter >= 1) {
+            increaseMulitplier();
+        } else {
+            resetMulitplier();
+        }
+
+        return calcScore(counter, set.size());
     }
 
     public GamePiece spawnPiece() {
@@ -171,5 +168,36 @@ public class Game {
 
     public void nextPiece() {
         currentPiece = spawnPiece();
+    }
+
+    public SimpleIntegerProperty getLives() {
+        return lives;
+    }
+
+    public SimpleIntegerProperty getScore() {
+        return score;
+    }
+
+    public SimpleIntegerProperty getLevel() {
+        return level;
+    }
+    public void setLevel() {
+        level.set(score.get()/1000);
+    }
+    public SimpleIntegerProperty getMultiplier() {
+        return multiplier;
+    }
+    public void increaseMulitplier() {
+        multiplier.set(multiplier.get() + 1);
+    }
+    public void resetMulitplier() {
+        multiplier.setValue(1);
+    }
+    public void setScore(int num) {
+        score.add(num);
+    }
+
+    public int calcScore(int numLines, int numBlocks) {
+        return numLines * numBlocks * 10 * getMultiplier().get();
     }
 }

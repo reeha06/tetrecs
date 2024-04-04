@@ -137,42 +137,4 @@ public class Grid {
             }
         return true;
     }
-//    public int afterPiece() {
-//        HashSet<GameBlockCoordinate> set = new HashSet<>();
-//        // find all complete rows
-//        int counter = 0;
-//        for (int i = 0; i < getRows(); i++) {
-//            boolean complete = true;
-//            for (int j = 0; j < getCols(); j++) {
-//                if (get(i, j) == 0) {
-//                    complete = false;
-//                }
-//            }
-//            if (complete) { // add all to set to zero
-//                counter ++;
-//                for (int j = 0; j < getCols(); j++)
-//                    set.add(new GameBlockCoordinate(i, j));
-//            }
-//        }
-//        // find all complete columns
-//        for (int j = 0; j < getRows(); j++) {
-//            boolean complete = true;
-//            for (int i = 0; i < getCols(); i++) {
-//                if (get(i, j) == 0) {
-//                    complete = false;
-//                }
-//            }
-//            if (complete) { // add all to set to zero
-//                counter ++;
-//                for (int i = 0; i < getCols(); i++)
-//                    set.add(new GameBlockCoordinate(i, j));
-//            }
-//        }
-//
-//        // zero all complete
-//        for (GameBlockCoordinate g: set) {
-//            set(g.getX(), g.getY(), 0);
-//        }
-//        return counter*100;
-//    }
 }
