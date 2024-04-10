@@ -51,6 +51,20 @@ public class Multimedia {
         }
 
     }
+    public static void playSound(String file) {
+
+        String music = Multimedia.class.getResource("/sounds/" + file).toExternalForm();
+        logger.info("Playing audio: " + music);
+
+        try {
+            Media play = new Media(music);
+            audioPlayer = new MediaPlayer(play);
+            audioPlayer.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Unable to play audio file, disabling audio");
+        }
+    }
 
     public static void stopAudio() {
         audioPlayer.stop();

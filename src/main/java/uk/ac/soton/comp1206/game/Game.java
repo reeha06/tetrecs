@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBlockCoordinate;
+import uk.ac.soton.comp1206.event.NextPieceListener;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -17,13 +18,15 @@ import java.util.Random;
 public class Game {
 
     private static final Logger logger = LogManager.getLogger(Game.class);
+    private NextPieceListener nextPieceListener;
     private Random rand = new Random();
-    public GamePiece currentPiece = spawnPiece();
-    public SimpleIntegerProperty lives = new SimpleIntegerProperty(3);
-    public SimpleIntegerProperty level = new SimpleIntegerProperty(0);
-    public SimpleIntegerProperty score = new SimpleIntegerProperty(0);
-    public SimpleIntegerProperty multiplier = new SimpleIntegerProperty(1);
-    public SimpleStringProperty piece = new SimpleStringProperty();
+    private GamePiece currentPiece = spawnPiece();
+    private GamePiece followingPiece = spawnPiece();
+    private SimpleIntegerProperty lives = new SimpleIntegerProperty(3);
+    private SimpleIntegerProperty level = new SimpleIntegerProperty(0);
+    private SimpleIntegerProperty score = new SimpleIntegerProperty(0);
+    private SimpleIntegerProperty multiplier = new SimpleIntegerProperty(1);
+    //public SimpleStringProperty piece = new SimpleStringProperty();
     /**
      * Number of rows
      */
@@ -64,6 +67,7 @@ public class Game {
      * Initialise a new game and set up anything that needs to be done at the start
      */
     public void initialiseGame() {
+        nextPiece();
         logger.info("Initialising game");
     }
 
@@ -155,6 +159,7 @@ public class Game {
         // if counter >= 1 then increase mulitplier by one otherwise put multiplier to 1 again
         if (counter >= 1) {
             increaseMulitplier();
+            Multimedia.playSound("clear.wav");
         } else {
             resetMulitplier();
         }
@@ -163,15 +168,22 @@ public class Game {
     }
 
     public GamePiece spawnPiece() {
-        return GamePiece.createPiece(rand.nextInt(15));
+        GamePiece piece = GamePiece.createPiece(rand.nextInt(15));
+        return piece;
     }
 
     public void nextPiece() {
-        currentPiece = spawnPiece();
+        currentPiece = followingPiece;
+        followingPiece = spawnPiece();
+        nextPieceListener.nextPiece(currentPiece, followingPiece);
+
     }
 
     public SimpleIntegerProperty getLives() {
         return lives;
+    }
+    public void setLives(int newLivesNum){
+        lives.set(newLivesNum);
     }
 
     public SimpleIntegerProperty getScore() {
@@ -199,5 +211,24 @@ public class Game {
 
     public int calcScore(int numLines, int numBlocks) {
         return numLines * numBlocks * 10 * getMultiplier().get();
+    }
+    public void setNextPieceListener(NextPieceListener listener) {
+        this.nextPieceListener = listener;
+    }
+    public void rotateCurrentPiece() {
+        currentPiece.rotate();
+        Multimedia.playSound("rotate.wav");
+    }
+    public void swapCurrentPiece() {
+        GamePiece temp = currentPiece;
+        currentPiece = followingPiece;
+        followingPiece = temp;
+        Multimedia.playSound("rotate.wav");
+    }
+    public GamePiece getCurrentPiece() {
+        return currentPiece;
+    }
+    public GamePiece getFollowingPiece() {
+        return followingPiece;
     }
 }

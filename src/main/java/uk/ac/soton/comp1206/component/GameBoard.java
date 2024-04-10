@@ -55,7 +55,7 @@ public class GameBoard extends GridPane {
      * The listener to call when a specific block is clicked
      */
     private BlockClickedListener blockClickedListener;
-
+    private BlockClickedListener rightClickedListener;
 
     /**
      * Create a new GameBoard, based off a given grid, with a visual width and height.
@@ -171,5 +171,7 @@ public class GameBoard extends GridPane {
             blockClickedListener.blockClicked(block);
         }
     }
-
+    public void setOnRightClicked(BlockClickedListener listener) {
+        this.rightClickedListener = listener;
+    }
 }

@@ -135,6 +135,7 @@ public class Grid {
                 if (piece[i][j] > 0)
                     set(i+x-offset, j+y-offset, piece[i][j]);
             }
+        Multimedia.playSound("place.wav");
         return true;
     }
 }
