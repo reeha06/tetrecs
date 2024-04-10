@@ -22,14 +22,16 @@ public class PieceBoard extends GameBoard{
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 grid.set(x, y, placePiece[x][y]);
-                logger.info(x + ", " + y + ", " + placePiece[x][y]);
+                //logger.info(x + ", " + y + ", " + placePiece[x][y]);
+                logger.info("Value: " + placePiece[x][y]);
             }
         }
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
-                logger.info(grid.get(x, y));
-            }
-        }
+//        for (int x = 0; x < 3; x++) {
+//            for (int y = 0; y < 3; y++) {
+//                logger.info(grid.get(x, y));
+//            }
+//        }
+        //grid.set(1, 1, 15);
         logger.info("Displayed piece: " + currentPiece.toString());
     }
 }

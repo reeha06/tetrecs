@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBlockCoordinate;
+import uk.ac.soton.comp1206.event.LineClearedListener;
 import uk.ac.soton.comp1206.event.NextPieceListener;
 
 import java.util.HashSet;
@@ -19,6 +20,7 @@ public class Game {
 
     private static final Logger logger = LogManager.getLogger(Game.class);
     private NextPieceListener nextPieceListener;
+    private LineClearedListener lineClearedListener;
     private Random rand = new Random();
     private GamePiece currentPiece = spawnPiece();
     private GamePiece followingPiece = spawnPiece();
@@ -151,7 +153,7 @@ public class Game {
                     set.add(new GameBlockCoordinate(i, j));
             }
         }
-
+        lineClearedListener.onLineCleared(set);
         // zero all complete
         for (GameBlockCoordinate g: set) {
             grid.set(g.getX(), g.getY(), 0);
@@ -214,6 +216,9 @@ public class Game {
     }
     public void setNextPieceListener(NextPieceListener listener) {
         this.nextPieceListener = listener;
+    }
+    public void setLineClearedListener(LineClearedListener listener) {
+        this.lineClearedListener = listener;
     }
     public void rotateCurrentPiece() {
         currentPiece.rotate();

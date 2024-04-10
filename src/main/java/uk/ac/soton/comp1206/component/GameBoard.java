@@ -7,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.event.BlockClickedListener;
 import uk.ac.soton.comp1206.game.Grid;
 
+import java.util.Set;
+
 /**
  * A GameBoard is a visual component to represent the visual GameBoard.
  * It extends a GridPane to hold a grid of GameBlocks.
@@ -148,6 +150,9 @@ public class GameBoard extends GridPane {
         //Add a mouse click handler to the block to trigger GameBoard blockClicked method
         block.setOnMouseClicked((e) -> blockClicked(e, block));
 
+        block.setOnMouseEntered(event -> block.hoverPaint()); // Change color on mouse enter
+        block.setOnMouseExited(event -> block.paint());
+
         return block;
     }
 
@@ -173,5 +178,11 @@ public class GameBoard extends GridPane {
     }
     public void setOnRightClicked(BlockClickedListener listener) {
         this.rightClickedListener = listener;
+    }
+    public void fadeOut(Set<GameBlockCoordinate> blocksToFadeOut) {
+        for (GameBlockCoordinate coordinates : blocksToFadeOut) {
+            GameBlock block = blocks[coordinates.getX()][coordinates.getY()];
+            block.fadeOut();
+        }
     }
 }

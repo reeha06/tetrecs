@@ -1,5 +1,6 @@
 package uk.ac.soton.comp1206.component;
 
+import javafx.animation.AnimationTimer;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
@@ -47,6 +48,8 @@ public class GameBlock extends Canvas {
 
     private final double width;
     private final double height;
+    private static final double FADE_OUT_RATE = 0.015;
+    private double opacity = 1.0;
 
     /**
      * The column this block exists as in the grid
@@ -106,9 +109,22 @@ public class GameBlock extends Canvas {
         //If the block is empty, paint as empty
         if(value.get() == 0) {
             paintEmpty();
-        } else {
+        } else if (x == 1 && y == 1 && gameBoard instanceof PieceBoard) {
+            paintCircle(COLOURS[value.get()]);
+        }else {
             //If the block is not empty, paint with the colour represented by the value
             paintColor(COLOURS[value.get()]);
+        }
+    }
+    public void hoverPaint() {
+        if (!(gameBoard instanceof PieceBoard)) {
+            var gc = getGraphicsContext2D();
+
+            gc.setFill(Color.rgb(255, 255, 255, 0.5));
+            gc.fillRect(0,0, width, height);
+
+            gc.setStroke(Color.WHITE);
+            gc.strokeRect(0,0,width,height);
         }
     }
 
@@ -122,11 +138,11 @@ public class GameBlock extends Canvas {
         gc.clearRect(0,0,width,height);
 
         //Fill
-        gc.setFill(Color.WHITE);
+        gc.setFill(Color.rgb(0, 0, 0, 0.5));
         gc.fillRect(0,0, width, height);
 
         //Border
-        gc.setStroke(Color.BLACK);
+        gc.setStroke(Color.WHITE);
         gc.strokeRect(0,0,width,height);
     }
 
@@ -141,12 +157,40 @@ public class GameBlock extends Canvas {
         gc.clearRect(0,0,width,height);
 
         //Colour fill
-        gc.setFill(colour);
+        //gc.setFill(colour);
+
+        //new 3D look
+        Stop[] stops = new Stop[]{new Stop(0, Color.WHITE), new Stop(1, (Color) colour)};
+        LinearGradient gradient = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, stops);
+        gc.setFill(gradient);
+
         gc.fillRect(0,0, width, height);
 
         //Border
         gc.setStroke(Color.BLACK);
         gc.strokeRect(0,0,width,height);
+    }
+
+    private void paintCircle(Paint colour) {
+        var gc = getGraphicsContext2D();
+
+        //Clear
+        gc.clearRect(0,0,width,height);
+        Stop[] stops = new Stop[]{new Stop(0, Color.WHITE), new Stop(1, (Color) colour)};
+        LinearGradient gradient = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, stops);
+        gc.setFill(gradient);
+
+        //Colour fill
+        gc.fillRect(0,0, width, height);
+
+        gc.setFill(Color.rgb(255, 255, 255, 0.7));
+        double cellWidth = 10;
+        double cellHeight = 10;
+        double circleRadius = Math.min(cellWidth, cellHeight) * 0.7; // Adjust the radius as needed
+        double circleCenterX = getWidth() / 2.0;
+        double circleCenterY = getHeight() / 2.0;
+
+        gc.fillOval(circleCenterX - circleRadius, circleCenterY - circleRadius, circleRadius * 2, circleRadius * 2);
     }
 
     /**
@@ -179,6 +223,29 @@ public class GameBlock extends Canvas {
      */
     public void bind(ObservableValue<? extends Number> input) {
         value.bind(input);
+    }
+    public void fadeOut() {
+        var gc = getGraphicsContext2D();
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                gc.clearRect(0,0,width,height);
+                // Decrease opacity gradually
+                opacity -= FADE_OUT_RATE;
+                if (opacity <= 0) {
+                    stop(); // Stop animation when opacity reaches 0
+                    paintEmpty();
+                }
+
+                // Update block color with new opacity
+                gc.setFill(Color.rgb(0, 255, 0, opacity));
+                gc.fillRect(0,0, width, height);
+
+                gc.setStroke(Color.WHITE);
+                gc.strokeRect(0,0,width,height);
+            }
+        };
+        timer.start();
     }
 
 }

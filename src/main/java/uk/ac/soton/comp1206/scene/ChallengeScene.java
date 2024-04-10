@@ -14,6 +14,7 @@ import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
+import uk.ac.soton.comp1206.component.GameBlockCoordinate;
 import uk.ac.soton.comp1206.component.GameBoard;
 import uk.ac.soton.comp1206.component.PieceBoard;
 import uk.ac.soton.comp1206.event.NextPieceListener;
@@ -23,6 +24,8 @@ import uk.ac.soton.comp1206.game.Grid;
 import uk.ac.soton.comp1206.game.Multimedia;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
+
+import java.util.Set;
 
 /**
  * The Single Player challenge scene. Holds the UI for the single player challenge mode in the game.
@@ -139,6 +142,7 @@ public class ChallengeScene extends BaseScene {
 
         b.getChildren().addAll(livesLabel, scoreLabel, levelLabel, multiplierLabel, incoming, pieceBoard, pieceBoard2);
         game.setNextPieceListener(this::showPiece);
+        game.setLineClearedListener(this::onLineCleared);
 
         mainPane.setRight(b);
 //         create timeline animation
@@ -165,6 +169,9 @@ public class ChallengeScene extends BaseScene {
         timeline.play();
         mainPane.setBottom(rectangle);
 
+    }
+    public void onLineCleared(Set<GameBlockCoordinate> clearedBlocks) {
+        board.fadeOut(clearedBlocks);
     }
     protected void showPiece(GamePiece piece, GamePiece piece2) {
         logger.info("Displaying piece: " + piece.toString());
