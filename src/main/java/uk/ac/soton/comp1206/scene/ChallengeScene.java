@@ -1,10 +1,13 @@
 package uk.ac.soton.comp1206.scene;
 
+import javafx.animation.FillTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -17,7 +20,6 @@ import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBlockCoordinate;
 import uk.ac.soton.comp1206.component.GameBoard;
 import uk.ac.soton.comp1206.component.PieceBoard;
-import uk.ac.soton.comp1206.event.NextPieceListener;
 import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.game.Grid;
@@ -39,6 +41,10 @@ public class ChallengeScene extends BaseScene {
     BorderPane mainPane;
     VBox b = new VBox();
     GameBoard board;
+    Rectangle rectangle = new Rectangle(800, 50, Color.GREEN);
+    GameBlock block;
+    int x = 0;
+    int y = 0;
 
     /**
      * Create a new Single Player challenge scene
@@ -128,6 +134,7 @@ public class ChallengeScene extends BaseScene {
             }
         });
 
+
 //        board.setOnMouseClicked(event -> {
 //            if (event.getButton() == MouseButton.SECONDARY) {
 //                //Right-click detected
@@ -145,18 +152,24 @@ public class ChallengeScene extends BaseScene {
         game.setLineClearedListener(this::onLineCleared);
 
         mainPane.setRight(b);
+
 //         create timeline animation
         Timeline timeline = new Timeline();
 //         create rectangle with initial width of 200
-        Rectangle rectangle = new Rectangle(800, 50, Color.BLUE);
+        //Rectangle rectangle = new Rectangle(800, 50, Color.GREEN);
 
 //         define the keyframe for animating rectangle's width to 0
-        KeyFrame shrinkKeyFrame = new KeyFrame(Duration.seconds(5), new KeyValue(rectangle.widthProperty(), 0));
+
+        KeyFrame shrinkKeyFrame = new KeyFrame(Duration.seconds(game.getTimerDelay()), new KeyValue(rectangle.widthProperty(), 0));
+        KeyFrame newColour = new KeyFrame(Duration.seconds(game.getTimerDelay()), e -> changeTransition());
 
         timeline.getKeyFrames().add(shrinkKeyFrame);
+        timeline.getKeyFrames().add(newColour);
         timeline.setOnFinished(e -> {
             // decrease lives by 1 when animation finishes
             game.setLives(game.getLives().get() - 1);
+            game.nextPiece();
+            game.resetMulitplier();
 
             // check if lives are above 0 before restarting animation
             if (game.getLives().get() > 0) {
@@ -164,11 +177,34 @@ public class ChallengeScene extends BaseScene {
                 rectangle.setWidth(800);
                 timeline.playFromStart();
             }
+
+            if (game.getLives().get() < 0) {
+                Platform.runLater(this::gameFinished);
+            }
         });
         // start animation
         timeline.play();
         mainPane.setBottom(rectangle);
 
+
+    }
+    public void changeTransition() {
+        logger.info("New trans");
+        FillTransition fillTransition = new FillTransition(Duration.seconds(game.getTimerDelay()), rectangle);
+        fillTransition.setFromValue(Color.GREEN);
+        fillTransition.setToValue(Color.RED);
+        fillTransition.play();
+    }
+    public void gameFinished() {
+        gameWindow.loadScene(new ScoresScene(gameWindow, game));
+    }
+    private void updateTimerBar(double progress) {
+        // Calculate width and color based on progress
+        double redValue = Math.max(0, Math.min(1, progress));
+        double greenValue = Math.max(0, Math.min(1, 1 - progress));
+        Color color = Color.color(redValue, greenValue, 0);
+
+        rectangle.setFill(color);
     }
     public void onLineCleared(Set<GameBlockCoordinate> clearedBlocks) {
         board.fadeOut(clearedBlocks);
@@ -205,6 +241,46 @@ public class ChallengeScene extends BaseScene {
     public void initialise() {
         logger.info("Initialising Challenge");
         game.start();
+
+        scene.setOnKeyPressed(event -> {
+            block = board.getBlock(x, y);
+            if (event.getCode() == KeyCode.ENTER) {
+                blockClicked(block);
+            } else if (event.getCode() == KeyCode.ESCAPE) {
+                gameWindow.startMenu();
+                //gameWindow.loadScene(new MenuScene(gameWindow));
+            } else if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.D) {
+                if (x + 1 >= 0 && x + 1 < 5) {
+                    logger.info("X: " + x + " Y: " + x);
+                    block.paint();
+                    x++;
+                    block = board.getBlock(x, y);
+                    block.hoverPaint();
+                }
+            } else if (event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.A) {
+                if (x - 1 >= 0 && x - 1 < 5) {
+                    block.paint();
+                    x--;
+                    block = board.getBlock(x, y);
+                    block.hoverPaint();
+                }
+            } else if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.W) {
+                if (y - 1 >= 0 && y - 1 < 5) {
+                    block.paint();
+                    y--;
+                    block = board.getBlock(x, y);
+                    block.hoverPaint();
+                }
+            } else if (event.getCode() == KeyCode.DOWN || event.getCode() == KeyCode.S) {
+                if (y + 1 >= 0 && y + 1 < 5) {
+                    block.paint();
+                    y++;
+                    block = board.getBlock(x, y);
+                    block.hoverPaint();
+                }
+            }
+            //block = board.getBlock(startx, starty);
+        });
     }
 
 }

@@ -91,11 +91,14 @@ public class Game {
         // get the position of this block
         int x = gameBlock.getX();
         int y = gameBlock.getY();
-        grid.playPiece(x, y, currentPiece);
+
+        if (grid.playPiece(x, y, currentPiece)) {
+            nextPiece();
+        }
+        //grid.playPiece(x, y, currentPiece);
         int s = afterPiece();
         score.set(score.get()+s);
         setLevel();
-        nextPiece();
     }
 
     /**
@@ -235,5 +238,8 @@ public class Game {
     }
     public GamePiece getFollowingPiece() {
         return followingPiece;
+    }
+    public int getTimerDelay() {
+        return (int) Math.max(2.5, 12 - 0.500 * level.get());
     }
 }

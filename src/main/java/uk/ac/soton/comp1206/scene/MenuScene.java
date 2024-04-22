@@ -1,11 +1,16 @@
 package uk.ac.soton.comp1206.scene;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.game.Multimedia;
@@ -49,17 +54,32 @@ public class MenuScene extends BaseScene {
         menuPane.getChildren().add(mainPane);
 
         //Awful title
-        var title = new Text("TetrECS");
-        title.getStyleClass().add("title");
+//        var title = new Text("TetrECS");
+//        title.getStyleClass().add("title");
         //mainPane.setTop(title);
+        ImageView imageView = new ImageView(getClass().getResource("/images/TetrECS.png").toExternalForm());
+        imageView.setFitWidth(487.5);
+        imageView.setFitHeight(100);
+        var button = new Button();
+        button.setGraphic(imageView);
+        button.setStyle("-fx-background-color: transparent;");
 
-        //For now, let us just add a button that starts the game. I'm sure you'll do something way better.
+//        Timeline timeline = new Timeline(
+//                new KeyFrame(Duration.seconds(0), event -> button.setRotate(0)),
+//                new KeyFrame(Duration.seconds(1), event -> button.setRotate(360)),
+//                new KeyFrame(Duration.seconds(2), event -> button.setRotate(720)),
+//                new KeyFrame(Duration.seconds(3), event -> button.setRotate(0))
+//        );
+
+
         VBox b = new VBox();
         var button1 = new Button("Single player");
         button1.getStyleClass().add("menuItem");
         var button2 = new Button("How to Play");
         button2.getStyleClass().add("menuItem");
-        b.getChildren().addAll(title, button1, button2);
+        b.getChildren().addAll(button, button1, button2);
+        b.setAlignment(Pos.CENTER);
+        b.setSpacing(20);
         mainPane.setCenter(b);
 
         Multimedia.playAudio("menu.mp3");
