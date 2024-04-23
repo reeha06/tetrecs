@@ -15,8 +15,10 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 
 public class ScoresScene extends BaseScene{
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
+    /**
+     * game is used to extract what the high score of the player was and any other information
+     */
     Game game;
-    ListProperty<Pair<String, Integer>> localScores;
     /**
      * Create a new scene, passing in the GameWindow the scene will be displayed in
      *
@@ -30,6 +32,10 @@ public class ScoresScene extends BaseScene{
     @Override
     public void initialise() {
     }
+
+    /**
+     * displays scores scene
+     */
     @Override
     public void build() {
         logger.info("Building " + this.getClass().getName());

@@ -179,6 +179,11 @@ public class GameBoard extends GridPane {
     public void setOnRightClicked(BlockClickedListener listener) {
         this.rightClickedListener = listener;
     }
+
+    /**
+     * causes this blocks to fade out because player cleared them
+     * @param blocksToFadeOut set of blocks to fade out
+     */
     public void fadeOut(Set<GameBlockCoordinate> blocksToFadeOut) {
         for (GameBlockCoordinate coordinates : blocksToFadeOut) {
             GameBlock block = blocks[coordinates.getX()][coordinates.getY()];

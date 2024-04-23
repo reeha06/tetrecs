@@ -8,30 +8,27 @@ import uk.ac.soton.comp1206.scene.MenuScene;
 
 public class PieceBoard extends GameBoard{
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
-    //protected final Grid grid;
-    protected GamePiece piece = null;
+    /**
+     * Create a new PieceBoard, based off a given grid, with a visual width and height.
+     * @param grid linked grid
+     * @param width the visual width
+     * @param height the visual height
+     */
     public PieceBoard(Grid grid, double width, double height) {
         super(grid, width, height);
-        //this.grid = new Grid(3,3);
-        //this.piece = currentPiece;
     }
+
+    /**
+     * @param currentPiece the piece to display on the pieceboard
+     */
     public void displayPiece(GamePiece currentPiece) {
-        this.piece = currentPiece;
+        logger.info("Piece displayed: " + currentPiece.toString());
         int[][] placePiece = currentPiece.getBlocks();
 
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 grid.set(x, y, placePiece[x][y]);
-                //logger.info(x + ", " + y + ", " + placePiece[x][y]);
-                logger.info("Value: " + placePiece[x][y]);
             }
         }
-//        for (int x = 0; x < 3; x++) {
-//            for (int y = 0; y < 3; y++) {
-//                logger.info(grid.get(x, y));
-//            }
-//        }
-        //grid.set(1, 1, 15);
-        logger.info("Displayed piece: " + currentPiece.toString());
     }
 }

@@ -20,11 +20,19 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 
 public class InstructionsScene extends BaseScene{
     private static final Logger logger = LogManager.getLogger(InstructionsScene.class);
+
+    /**
+     * Create a new instructions scene
+     * @param gameWindow the Game Window this will be displayed in
+     */
     public InstructionsScene(GameWindow gameWindow) {
         super(gameWindow);
-        logger.info("Creating instructions Scene");
     }
 
+    /**
+     * handles keyboard events
+     * if escape is pressed then gameWindow goes back to menu
+     */
     @Override
     public void initialise() {
         scene.setOnKeyPressed(event -> {
@@ -34,6 +42,9 @@ public class InstructionsScene extends BaseScene{
         });
     }
 
+    /**
+     * displays instructions
+     */
     @Override
     public void build() {
         logger.info("Building " + this.getClass().getName());
@@ -50,7 +61,6 @@ public class InstructionsScene extends BaseScene{
         var mainPane = new BorderPane();
         instructionsPane.getChildren().add(mainPane);
 
-        //Image image = new Image("/images/Instructions.png");
         ImageView imageView = new ImageView(getClass().getResource("/images/Instructions.png").toExternalForm());
         imageView.setFitWidth(487.5);
         imageView.setFitHeight(300);
@@ -58,7 +68,6 @@ public class InstructionsScene extends BaseScene{
         var title = new Text("Instructions");
         title.getStyleClass().add("title");
         button.setGraphic(imageView);
-        //button.setDisable(true);
         button.setStyle("-fx-background-color: transparent;");
         VBox box = new VBox();
         box.getChildren().addAll(title, button);

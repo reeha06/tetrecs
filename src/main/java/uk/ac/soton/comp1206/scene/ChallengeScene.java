@@ -35,16 +35,38 @@ import java.util.Set;
 public class ChallengeScene extends BaseScene {
 
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
+    /**
+     * game
+     */
     protected Game game;
-    PieceBoard pieceBoard;
-    PieceBoard pieceBoard2;
-    BorderPane mainPane;
-    VBox b = new VBox();
-    GameBoard board;
-    Rectangle rectangle = new Rectangle(800, 50, Color.GREEN);
-    GameBlock block;
-    int x = 0;
-    int y = 0;
+    /**
+     * the pieceBoard that has the currentPiece
+     */
+    private PieceBoard pieceBoard;
+    /**
+     * the pieceBoard that has the followingPiece
+     */
+    private PieceBoard pieceBoard2;
+    private BorderPane mainPane;
+    private VBox b = new VBox();
+    /**
+     * the GameBoard where player places pieces
+     */
+    private GameBoard board;
+    /**
+     * used for the countdown animation
+     * create rectangle with initial width of 200
+     */
+    private Rectangle rectangle = new Rectangle(800, 50, Color.GREEN);
+    private GameBlock block;
+    /**
+     * to keep track of the x when positioning and dropping pieces via the keyboard
+     */
+    private int x = 0;
+    /**
+     * to keep track of the y when positioning and dropping pieces via the keyboard
+     */
+    private int y = 0;
 
     /**
      * Create a new Single Player challenge scene
@@ -64,7 +86,9 @@ public class ChallengeScene extends BaseScene {
 
         setupGame();
 
+        // stops any other audio playing
         Multimedia.stopAudio();
+        // plays game music
         Multimedia.playMusic("game_start.wav");
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
@@ -96,10 +120,11 @@ public class ChallengeScene extends BaseScene {
         levelLabel.setStyle("-fx-text-fill: white;");
         levelLabel.getStyleClass().add("level");
 
-        Label multiplierLabel = new Label();
-        multiplierLabel.textProperty().bind(game.getMultiplier().asString("Multiplier: x%d"));
-        multiplierLabel.setFont(new Font(42));
-        multiplierLabel.setStyle("-fx-text-fill: white;");
+//        multiplier used for testing
+//        Label multiplierLabel = new Label();
+//        multiplierLabel.textProperty().bind(game.getMultiplier().asString("Multiplier: x%d"));
+//        multiplierLabel.setFont(new Font(42));
+//        multiplierLabel.setStyle("-fx-text-fill: white;");
 
         Label scoreLabel = new Label();
         scoreLabel.textProperty().bind(game.getScore().asString("Score: %d"));
@@ -115,7 +140,7 @@ public class ChallengeScene extends BaseScene {
         pieceBoard = new PieceBoard(new Grid(3, 3), 150, 150);
         pieceBoard.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
-                //Left-click detected
+                //Left-click detected so rotates piece
                 game.rotateCurrentPiece();
                 GamePiece piece = game.getCurrentPiece();
                 pieceBoard.displayPiece(piece);
@@ -125,7 +150,7 @@ public class ChallengeScene extends BaseScene {
         pieceBoard2 = new PieceBoard(new Grid(3, 3), 100, 100);
         pieceBoard2.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
-                //Left-click detected
+                //Left-click detected so swaps pieces on both pieceBoards
                 game.swapCurrentPiece();
                 GamePiece piece = game.getCurrentPiece();
                 pieceBoard.displayPiece(piece);
@@ -134,20 +159,11 @@ public class ChallengeScene extends BaseScene {
             }
         });
 
-
-//        board.setOnMouseClicked(event -> {
-//            if (event.getButton() == MouseButton.SECONDARY) {
-//                //Right-click detected
-//                game.rotateCurrentPiece();
-//                GamePiece piece = game.getCurrentPiece();
-//                pieceBoard.displayPiece(piece);
-//            }
-//        });
-
         Insets insets = new Insets(20, 20, 20, 20);
         pieceBoard2.setPadding(insets);
 
-        b.getChildren().addAll(livesLabel, scoreLabel, levelLabel, multiplierLabel, incoming, pieceBoard, pieceBoard2);
+        // labels displayed
+        b.getChildren().addAll(livesLabel, scoreLabel, levelLabel, incoming, pieceBoard, pieceBoard2);
         game.setNextPieceListener(this::showPiece);
         game.setLineClearedListener(this::onLineCleared);
 
@@ -155,10 +171,6 @@ public class ChallengeScene extends BaseScene {
 
 //         create timeline animation
         Timeline timeline = new Timeline();
-//         create rectangle with initial width of 200
-        //Rectangle rectangle = new Rectangle(800, 50, Color.GREEN);
-
-//         define the keyframe for animating rectangle's width to 0
 
         KeyFrame shrinkKeyFrame = new KeyFrame(Duration.seconds(game.getTimerDelay()), new KeyValue(rectangle.widthProperty(), 0));
         KeyFrame newColour = new KeyFrame(Duration.seconds(game.getTimerDelay()), e -> changeTransition());
@@ -177,8 +189,8 @@ public class ChallengeScene extends BaseScene {
                 rectangle.setWidth(800);
                 timeline.playFromStart();
             }
-
-            if (game.getLives().get() < 0) {
+            // if lives is 0 or less then game is finished
+            if (game.getLives().get() <= 0) {
                 Platform.runLater(this::gameFinished);
             }
         });
@@ -188,6 +200,10 @@ public class ChallengeScene extends BaseScene {
 
 
     }
+
+    /**
+     * changes the animated countdown from green to red as urgency increases
+     */
     public void changeTransition() {
         logger.info("New trans");
         FillTransition fillTransition = new FillTransition(Duration.seconds(game.getTimerDelay()), rectangle);
@@ -195,20 +211,28 @@ public class ChallengeScene extends BaseScene {
         fillTransition.setToValue(Color.RED);
         fillTransition.play();
     }
+
+    /**
+     * when game is over, the ScoresScene is shown
+     */
     public void gameFinished() {
+        logger.info("Game over.");
         gameWindow.loadScene(new ScoresScene(gameWindow, game));
     }
-    private void updateTimerBar(double progress) {
-        // Calculate width and color based on progress
-        double redValue = Math.max(0, Math.min(1, progress));
-        double greenValue = Math.max(0, Math.min(1, 1 - progress));
-        Color color = Color.color(redValue, greenValue, 0);
 
-        rectangle.setFill(color);
-    }
+    /**
+     * does a fade out animation on the lines that were cleared in the board
+     * @param clearedBlocks
+     */
     public void onLineCleared(Set<GameBlockCoordinate> clearedBlocks) {
         board.fadeOut(clearedBlocks);
     }
+
+    /**
+     * displays pieces on pieceBoards
+     * @param piece displayed on pieceBoard
+     * @param piece2 displayed on pieceBoard2
+     */
     protected void showPiece(GamePiece piece, GamePiece piece2) {
         logger.info("Displaying piece: " + piece.toString());
         pieceBoard.displayPiece(piece);
@@ -220,7 +244,6 @@ public class ChallengeScene extends BaseScene {
      * @param gameBlock the Game Block that was clocked
      */
     private void blockClicked(GameBlock gameBlock) {
-        //game.playPiece(gameBlock);
         game.blockClicked(gameBlock);
     }
 
@@ -236,6 +259,7 @@ public class ChallengeScene extends BaseScene {
 
     /**
      * Initialise the scene and start the game
+     * handles keyboard support
      */
     @Override
     public void initialise() {
@@ -244,11 +268,10 @@ public class ChallengeScene extends BaseScene {
 
         scene.setOnKeyPressed(event -> {
             block = board.getBlock(x, y);
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.X) {
                 blockClicked(block);
             } else if (event.getCode() == KeyCode.ESCAPE) {
                 gameWindow.startMenu();
-                //gameWindow.loadScene(new MenuScene(gameWindow));
             } else if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.D) {
                 if (x + 1 >= 0 && x + 1 < 5) {
                     logger.info("X: " + x + " Y: " + x);
@@ -278,8 +301,23 @@ public class ChallengeScene extends BaseScene {
                     block = board.getBlock(x, y);
                     block.hoverPaint();
                 }
+            } else if (event.getCode() == KeyCode.SPACE || event.getCode() == KeyCode.R) {
+                game.swapCurrentPiece();
+                GamePiece piece = game.getCurrentPiece();
+                pieceBoard.displayPiece(piece);
+                GamePiece piece2 = game.getFollowingPiece();
+                pieceBoard2.displayPiece(piece2);
+            } else if (event.getCode() == KeyCode.Q || event.getCode() == KeyCode.Z || event.getCode() == KeyCode.OPEN_BRACKET) {
+                game.rotateCurrentPiece();
+                game.rotateCurrentPiece();
+                game.rotateCurrentPiece();
+                GamePiece piece = game.getCurrentPiece();
+                pieceBoard.displayPiece(piece);
+            } else if (event.getCode() == KeyCode.E || event.getCode() == KeyCode.C || event.getCode() == KeyCode.CLOSE_BRACKET) {
+                game.rotateCurrentPiece();
+                GamePiece piece = game.getCurrentPiece();
+                pieceBoard.displayPiece(piece);
             }
-            //block = board.getBlock(startx, starty);
         });
     }
 

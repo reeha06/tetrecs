@@ -104,6 +104,9 @@ public class GameBlock extends Canvas {
 
     /**
      * Handle painting of the block canvas
+     * paints empty if value of block is 0
+     * or if the block belongs to the pieceboard and its the block in the middle of the pieceboard, then paint an indicator on it
+     * otherwise paint the block with whatever its value is
      */
     public void paint() {
         //If the block is empty, paint as empty
@@ -116,6 +119,11 @@ public class GameBlock extends Canvas {
             paintColor(COLOURS[value.get()]);
         }
     }
+
+    /**
+     * handles the painting of a block if the mouse hovers above it
+     * adds a transparent white on top so it looks like its highlighted
+     */
     public void hoverPaint() {
         if (!(gameBoard instanceof PieceBoard)) {
             var gc = getGraphicsContext2D();
@@ -148,6 +156,7 @@ public class GameBlock extends Canvas {
 
     /**
      * Paint this canvas with the given colour
+     * makes blocks look animated
      * @param colour the colour to paint
      */
     private void paintColor(Paint colour) {
@@ -171,6 +180,10 @@ public class GameBlock extends Canvas {
         gc.strokeRect(0,0,width,height);
     }
 
+    /**
+     * paints a circle on top of the block
+     * @param colour the colour of the block to paint
+     */
     private void paintCircle(Paint colour) {
         var gc = getGraphicsContext2D();
 
@@ -224,6 +237,10 @@ public class GameBlock extends Canvas {
     public void bind(ObservableValue<? extends Number> input) {
         value.bind(input);
     }
+
+    /**
+     * makes the block fade out from a green to nothing
+     */
     public void fadeOut() {
         var gc = getGraphicsContext2D();
         AnimationTimer timer = new AnimationTimer() {

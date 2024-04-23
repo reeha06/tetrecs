@@ -126,8 +126,20 @@ public class Grid {
         return true;
     }
 
+    /**
+     * checks if piece can be played
+     * if it can't be played then plays fail sound and returns false
+     * if it can be played then plays successful sound and returns true
+     * @param x: row
+     * @param y: column
+     * @param gp: GamePiece
+     * @return if piece can be played
+     */
     boolean playPiece(int x, int y, GamePiece gp){
-        if (!canPlayPiece(x, y, gp)) return false;
+        if (!canPlayPiece(x, y, gp)) {
+            Multimedia.playSound("fail.wav");
+            return false;
+        }
         int[][] piece = gp.getBlocks();
         int offset = piece.length/2;
         for (int i = 0; i < piece.length; i++)

@@ -21,14 +21,34 @@ public class Game {
     private static final Logger logger = LogManager.getLogger(Game.class);
     private NextPieceListener nextPieceListener;
     private LineClearedListener lineClearedListener;
+    /**
+     * used to create random integer values
+     */
     private Random rand = new Random();
+    /**
+     * current piece is a random piece
+     */
     private GamePiece currentPiece = spawnPiece();
+    /**
+     * following piece is a random piece
+     */
     private GamePiece followingPiece = spawnPiece();
+    /**
+     * lives initialised to 3
+     */
     private SimpleIntegerProperty lives = new SimpleIntegerProperty(3);
+    /**
+     * level initialised to 0
+     */
     private SimpleIntegerProperty level = new SimpleIntegerProperty(0);
+    /**
+     * score initialised to 0
+     */
     private SimpleIntegerProperty score = new SimpleIntegerProperty(0);
+    /**
+     * multiplier initialised to 1
+     */
     private SimpleIntegerProperty multiplier = new SimpleIntegerProperty(1);
-    //public SimpleStringProperty piece = new SimpleStringProperty();
     /**
      * Number of rows
      */
@@ -78,15 +98,7 @@ public class Game {
      * @param gameBlock the block that was clicked
      */
     public void blockClicked(GameBlock gameBlock) {
-//        //Get the new value for this block
-//        int previousValue = grid.get(x,y);
-//        int newValue = previousValue + 1;
-//        if (newValue  > GamePiece.PIECES) {
-//            newValue = 0;
-//        }
-//
-//        //Update the grid with the new value
-//        grid.set(x,y,newValue);
+        logger.info("A block was clicked.");
 
         // get the position of this block
         int x = gameBlock.getX();
@@ -125,6 +137,10 @@ public class Game {
         return rows;
     }
 
+    /**
+     * clears lines
+     * @return score depending on how many blocks and lines the player cleared
+     */
     public int afterPiece() {
         HashSet<GameBlockCoordinate> set = new HashSet<>();
         // find all complete rows
@@ -172,11 +188,19 @@ public class Game {
         return calcScore(counter, set.size());
     }
 
+    /**
+     * creates a random piece
+     * @return piece
+     */
     public GamePiece spawnPiece() {
         GamePiece piece = GamePiece.createPiece(rand.nextInt(15));
         return piece;
     }
 
+    /**
+     * updates current piece
+     * following piece is updated to a random piece
+     */
     public void nextPiece() {
         currentPiece = followingPiece;
         followingPiece = spawnPiece();
@@ -184,61 +208,122 @@ public class Game {
 
     }
 
+    /**
+     * @return lives
+     */
     public SimpleIntegerProperty getLives() {
         return lives;
     }
+
+    /**
+     * sets lives
+     * @param newLivesNum used to set the number of lives
+     */
     public void setLives(int newLivesNum){
         lives.set(newLivesNum);
     }
 
+    /**
+     * @return score
+     */
     public SimpleIntegerProperty getScore() {
         return score;
     }
-
+    /**
+     * @return level
+     */
     public SimpleIntegerProperty getLevel() {
         return level;
     }
+    /**
+     * sets levels
+     * levels depends on the score, for every 1000 increase in score, the level increases by one
+     */
     public void setLevel() {
         level.set(score.get()/1000);
     }
+
+    /**
+     * @return multiplier
+     */
     public SimpleIntegerProperty getMultiplier() {
         return multiplier;
     }
+
+    /**
+     * increases multiplier by one
+     */
     public void increaseMulitplier() {
         multiplier.set(multiplier.get() + 1);
     }
+    /**
+     * resets multiplier to one
+     */
     public void resetMulitplier() {
         multiplier.setValue(1);
     }
-    public void setScore(int num) {
-        score.add(num);
-    }
 
+    /**
+     * calculates score
+     * @param numLines that were cleared
+     * @param numBlocks in a line
+     * @return calculated score
+     */
     public int calcScore(int numLines, int numBlocks) {
         return numLines * numBlocks * 10 * getMultiplier().get();
     }
+
+    /**
+     * @param listener set to this listener
+     */
     public void setNextPieceListener(NextPieceListener listener) {
         this.nextPieceListener = listener;
     }
+    /**
+     * @param listener set to this listener
+     */
     public void setLineClearedListener(LineClearedListener listener) {
         this.lineClearedListener = listener;
     }
+
+    /**
+     * rotates piece
+     * plays rotate sound
+     */
     public void rotateCurrentPiece() {
+        logger.info("Piece rotated");
         currentPiece.rotate();
         Multimedia.playSound("rotate.wav");
     }
+    /**
+     * swaps pieces of both pieceboards
+     * plays swap sound
+     */
     public void swapCurrentPiece() {
+        logger.info("Piece swapped");
         GamePiece temp = currentPiece;
         currentPiece = followingPiece;
         followingPiece = temp;
         Multimedia.playSound("rotate.wav");
     }
+
+    /**
+     * @return currentPiece
+     */
     public GamePiece getCurrentPiece() {
         return currentPiece;
     }
+
+    /**
+     * @return followingPiece
+     */
     public GamePiece getFollowingPiece() {
         return followingPiece;
     }
+
+    /**
+     * @return calculated time to run out depending on the level
+     */
     public int getTimerDelay() {
         return (int) Math.max(2.5, 12 - 0.500 * level.get());
     }

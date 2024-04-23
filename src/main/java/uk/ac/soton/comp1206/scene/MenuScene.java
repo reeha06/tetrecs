@@ -1,6 +1,7 @@
 package uk.ac.soton.comp1206.scene;
 
 import javafx.animation.KeyFrame;
+import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
@@ -36,13 +37,14 @@ public class MenuScene extends BaseScene {
 
     /**
      * Build the menu layout
+     * displays logo
+     * displays two buttons
      */
     @Override
     public void build() {
         logger.info("Building " + this.getClass().getName());
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
-
 
         var menuPane = new StackPane();
         menuPane.setMaxWidth(gameWindow.getWidth());
@@ -53,10 +55,6 @@ public class MenuScene extends BaseScene {
         var mainPane = new BorderPane();
         menuPane.getChildren().add(mainPane);
 
-        //Awful title
-//        var title = new Text("TetrECS");
-//        title.getStyleClass().add("title");
-        //mainPane.setTop(title);
         ImageView imageView = new ImageView(getClass().getResource("/images/TetrECS.png").toExternalForm());
         imageView.setFitWidth(487.5);
         imageView.setFitHeight(100);
@@ -64,19 +62,17 @@ public class MenuScene extends BaseScene {
         button.setGraphic(imageView);
         button.setStyle("-fx-background-color: transparent;");
 
-//        Timeline timeline = new Timeline(
-//                new KeyFrame(Duration.seconds(0), event -> button.setRotate(0)),
-//                new KeyFrame(Duration.seconds(1), event -> button.setRotate(360)),
-//                new KeyFrame(Duration.seconds(2), event -> button.setRotate(720)),
-//                new KeyFrame(Duration.seconds(3), event -> button.setRotate(0))
-//        );
-
-
         VBox b = new VBox();
         var button1 = new Button("Single player");
         button1.getStyleClass().add("menuItem");
+        button1.setOnMouseEntered(event -> button1.setStyle("-fx-text-fill: blue;")); // Change text color to red on hover
+        button1.setOnMouseExited(event -> button1.setStyle("-fx-text-fill: black;"));
+
         var button2 = new Button("How to Play");
         button2.getStyleClass().add("menuItem");
+        button2.setOnMouseEntered(event -> button2.setStyle("-fx-text-fill: blue;")); // Change text color to red on hover
+        button2.setOnMouseExited(event -> button2.setStyle("-fx-text-fill: black;"));
+
         b.getChildren().addAll(button, button1, button2);
         b.setAlignment(Pos.CENTER);
         b.setSpacing(20);
@@ -84,6 +80,10 @@ public class MenuScene extends BaseScene {
 
         Multimedia.playAudio("menu.mp3");
 
+        RotateTransition rotateTransition = new RotateTransition(Duration.seconds(5), button);
+        rotateTransition.setByAngle(360 * 2); // Rotate the button three times (360 degrees * 3)
+        rotateTransition.setCycleCount(1); // Set the cycle count to 1 to spin the button only once
+        rotateTransition.play();
         //Bind the button action to the startGame method in the menu
         button1.setOnAction(this::startGame);
         button2.setOnAction(this::instructions);
@@ -98,12 +98,16 @@ public class MenuScene extends BaseScene {
     }
 
     /**
-     * Handle when the Start Game button is pressed
+     * Handle when the Single player Game button is pressed
      * @param event event
      */
     private void startGame(ActionEvent event) {
         gameWindow.startChallenge();
     }
+    /**
+     * Handle when the How to play Game button is pressed
+     * @param event event
+     */
     private void instructions(ActionEvent event) {
         gameWindow.loadScene(new InstructionsScene(gameWindow));
     }

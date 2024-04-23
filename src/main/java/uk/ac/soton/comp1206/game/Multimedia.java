@@ -13,12 +13,20 @@ public class Multimedia {
     private static final Logger logger = LogManager.getLogger(Multimedia.class);
     private static boolean audioEnabled = true;
     private static boolean musicEnabled = true;
+    /**
+     * audioPlayer that plays audio
+     */
     private static MediaPlayer audioPlayer;
+    /**
+     * musicPlayer that plays music
+     */
     private static MediaPlayer musicPlayer;
 
+    /**
+     * plays audio
+     * @param file location of audio file
+     */
     public static void playAudio(String file) {
-        if (!audioEnabled) return;
-
         String music = Multimedia.class.getResource("/music/" + file).toExternalForm();
         logger.info("Playing audio: " + music);
 
@@ -33,9 +41,11 @@ public class Multimedia {
         }
     }
 
+    /**
+     * plays music on a loop
+     * @param file location of music file
+     */
     public static void playMusic(String file) {
-        if (!musicEnabled) return;
-
         String bgMusic = Multimedia.class.getResource("/music/" + file).toExternalForm();
         logger.info("Playing audio: " + bgMusic);
 
@@ -51,8 +61,12 @@ public class Multimedia {
         }
 
     }
-    public static void playSound(String file) {
 
+    /**
+     * plays sounds
+     * @param file location of sound file
+     */
+    public static void playSound(String file) {
         String music = Multimedia.class.getResource("/sounds/" + file).toExternalForm();
         logger.info("Playing audio: " + music);
 
@@ -66,6 +80,9 @@ public class Multimedia {
         }
     }
 
+    /**
+     * stops audio
+     */
     public static void stopAudio() {
         audioPlayer.stop();
     }
